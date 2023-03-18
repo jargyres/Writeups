@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">   
+        <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+    </head>
+    <body>
+    <title>OverTheWire Krypton</title>
+    <div id="navbar">
+        <div class="cube">
+            <div class="top"></div>
+            <div class="right"></div>
+            <div class="bottom"></div>
+            <div class="left"></div>
+            <div class="front"></div>
+            <div class="back"></div>
+          </div>
+        <a href="../../index.html">Home</a>
+        <a href="writeups.html">Writeups</a>
+    </div>
+    <script src="../stickyNav.js"></script>
+    <br>
+    <h1>OverTheWire Krypton</h1>
+    <hr />
+    <p>
+        Krypton is the next installment in the OverTheWire wargames.
+        These challenges are designed to give experience in cryptography and cryptanalysis. You are encouraged to 
+        find the solutions yourself rather than turn to a premade cryptanalysis tool.
+    </p>
+    <br>
+    
+    <div class="c2">
+        All Krypton Levels:
+    <a href="#0to1">Level 0 to 1</a>
+    <a href="#1to2">Level 1 to 2</a>
+    <a href="#2to3">Level 2 to 3</a>
+    <a href="#3to4">Level 3 to 4</a>
+    <a href="#4to5">Level 4 to 5</a>
+    <a href="#5to6">Level 5 to 6</a>
+    <a href="#6to7">Level 6 to 7</a>
+    </div>
+    <br>
+
+    <a id="0to1"></a>
+    <h1>Level 0 to Level 1</h1><br>
+    <p>For the first level, we are given the password as a Base64 encoded string. All we have to do is use <strong>base64 -d</strong> to decode the string.</p><br>
+    <img src="../images/kb64.png"><br><br>
+    <p>So we can see the password for level 1 is <strong>KRYPTONISGREAT</strong></p>
+    <hr />
+    <br>
+    <a id="1to2"></a>
+    <h1>Level 1 to Level 2</h1><br>
+    <p>We are told the password for level 2 is in a file called <strong>krypton2</strong>.
+    We are also told that the file has been encrypted by a simple rotation algorithm.</p><br>
+    <p>The first step is to find the file. After poking around, we find the file in <strong>/krypton/krypton1/</trong></p><br>
+    <img src="../images/k1cd.png"><br><br>
+    <p>There we can look at the README. In that file we are told the password is 'encrypted' using the ROT13 algorithm. In this algorithm, a letter is replaced with the 13th letter after it. The alphabet is treated as a circular list, where 'z' loops back around to 'a'.
+        So in this case, in ROT13, the letter 'x' is replaced with the letter 'k' and vice versa. This means applying the algorithm to a string twice returns the original string.
+    </p><br>
+    <p>To solve this, we can use the Unix program <strong>tr</strong>, which translates characters. The program accepts sets of letters as the arguments. To preform the ROT13 algorithm, we 
+    execute <strong>tr 'A-Za-z' 'N-ZA-Mn-za-m'</strong>. The arguments means that each character in the first set is replaced by the second set, so 'A' is replaced by 'N', and same for lowercase letters.</p><br>
+    <img src="../images/k1tr.png"><br><br>
+    <p>So we have the password for level 2 is <strong>ROTTEN</strong></p>
+    <hr />
+    <br>
+    <a id="2to3"></a>
+    <h1>Level 2 to Level 3</h1><br>
+    <p>For this level, we are introduced to the <strong>Ceasar Cipher</strong>. This algorithm shifts letters along the alphabet by a certain set number. This is similar to ROT13, where instead of shifting by 13, we can shift by any amount.</p><br>
+    <p>The encrypted password is in the file <strong>krypton3</strong>. We also has a binary, <strong>encrypt</strong>, that performs the Ceasar Cipher according to the <strong>keyfile.dat</strong> on the given file.</p><br>
+    <p>First, we have to set up our environment to work in a temporary directory by linking <strong>keyfile.dat</strong> to our directory.</p><br>
+    <img src="../images/k2temp.png"><br><br>
+    <p>Then running the <strong>encrypt</strong> binary on <strong>krypton3</strong>, we get a file called <strong>ciphertext</strong>, which is the result of the cipher being executed.</p><br>
+    <img src="../images/k21st.png"><br><br>
+    <p>Comparing the result to the original string, we can see it is rotated 12 letters. We can solve this cipher by brute force fairly easily. the process would be that we copy the results from <strong>ciphertext</strong>
+    to another file, and apply the cipher again until we see a result that makes sense.</p><br>
+    <img src="../images/k2cat.png"><br><br>
+    <p>We finally get a result that makes sense. So we have the password to level 3 is <strong>CAESARISEASY</strong></p>
+    <hr />
+    <br>
+    <a id="3to4"></a>
+    <h1>Level 3 to Level 4</h1><br>
+    <p>For this level, we are told that the password is encrypted using a substitution cipher, however, we do not know the key for cipher. This makes it much more difficult to brute force the problem.</p><br>
+    <p>Luckily, we are given several files also encrypted with the same cipher, <strong>found1, found2, and found3</strong>. Given these files, we can use <strong>frequency analysis</strong> to determine which letters were substituted in.</p><br>
+    <p>The basics of frequency analysis relies on the fact that certain letters in English are used more often than others. In particular we can refer to this chart to see the frequency of letters in the English language.</p><br>
+    <img src="../images/1200px-English_letter_frequency_(frequency).svg.png"><br><br>
+    <p>To preform simple frequency analysis on these files, all we have to do is use <strong>grep -o "letter"</strong> on the file where "letter" is 
+    in the range A-Z. This will give us all line of occurences of "letter". The we use <strong>wc -l</strong> on the result to count the number of 
+    lines that we got back.</p><br>
+    <p>So what we need to do is loop through all A-Z, take the occurence count, format it properly and put the number in a file in a temporary directory. Then we can sort the file to see the frequency of letters for the file.</p><br>
+    <img src="../images/k3freq.png"><br><br>
+    <p>We can take these results and compare to the letter frequency chart. Looking at the results, the letter "S" is the most frequent, which would lead us to believe that "S"->"E", being that the letter "E" is the most frequent in the alphabet.</p><br>
+    <p>Now comes the tedious step, of lining up the frequency we observed to the real letter frequency. Simply lining up the letter frequency will not get you the correct answer.</p><br>
+    <p>The next idea in frequency analysis is by using the fact that certain sequences are more common that others in the english language. You can learn more by visiting <a href="https://www3.nd.edu/~busiforc/handouts/cryptography/cryptography%20hints.html">https://www3.nd.edu/~busiforc/handouts/cryptography/cryptography%20hints.html</a></p><br>
+    <p>I found the analysis of these files by using a pre-made frequency analysis. Specifically <a href="http://www.richkni.co.uk/php/crypta/freq.php">http://www.richkni.co.uk/php/crypta/freq.php</a>. With this information, we can start building back up the ciphertext to plaintext.</p><br>
+    <p>We find that the plaintext is translated into ciphertext using the following key:</p><br>
+    <p>Ciphertext: A B C D E F G H I J K L M N O P Q R S T U V W X W Z</p>
+    <p>Plaintext:  B O I H G K N Q V T W Y U R X Z A J E M S L D F P C</p><br>
+    <img src="../images/k3tr.png"><br><br>
+    <p>So we have the password for level 4: <strong>BRUTE</strong></p>
+    <hr />
+    <br>
+    <a id="4to5"></a>
+    <h1>Level 4 to Level 5</h1><br>
+    <p>For this level, we are told that we will be dealing with a Vigenère Cipher. This cipher is a polyalphabetic cipher where the mappings are decided by a key of a known length.</p><br>
+    <p>The basics of the Vigenère Cipher is well explained by Geeks for Geeks <a href="https://www.geeksforgeeks.org/vigenere-cipher/">here</a></p><br>
+    <p>Essentially, we use the key(K) to cipher the plaintext(P) by adding the next character of K to the next character of P. If we reach the end of the key(K), we roll back to the beginning.
+        If a letter exceeds 25 in value, we roll back to 0 (working in modulo 26 for the English alphabet).
+    </p><br>
+    <p>We are given the fact that the key length is 6 and that we have two longer messages, <strong>found1</strong> and <strong>found2</strong> encrypted with the same key.</p><br>
+    <p>The key to this challenge is that we have to do frequency analysis on the longer messages, specifically to separately find the characters to the key.
+         Since we know that the key length is 6, to find the key's first letter, we must look at the 1st letter, then the 6th, then the 12th, and so on. From this we can see the most common letters amongst the result and work backwards to find the key.</p><br>
+    <p>The following commands first remove the whitespace in <strong>found1</strong> and stores it in <strong>F1</strong>. Then we find the length of <strong>F1</strong>.
+    After that, we do a for loop, from 0 to the length of F1 in increments of 6, index those characters from <strong>F1</strong>, and write the result to <strong>freq</strong>, which is stored in a temporary directory.
+Then, we use the command from last level to find the count of the letters in <strong>freq</strong></p><br>
+    <img src="../images/k4freq1.png"><br><br>
+    <p>So we have the most common letter is <strong>J</strong>, we know from the last level that the most common letter is usually <strong>E</strong>. This 
+    means that if we number the alphabet from 0, we get the value for <strong>J</strong> is 9 and <strong>E</strong> is 4. So the first letter is at index 5 in the alphabet to move <strong>E</strong> to <strong>J</strong>.
+So we have the first letter of the key is <strong>F</strong></p><br>
+    <p>To get the rest of the letters, just change the starting of the indexing for the characters in <strong>F1</strong>. Starting the indexing at 1 and following the frequency analysis will get you the 2nd letter to the key.</p><br>
+    <p>The final key ends up becomind <strong>FREKEY</strong>.</p><br>
+    <p>To finish off this level, we need to decipher <strong>krypton5</strong>. You can program this yourself, but I tend to use <a href="https://www.dcode.fr/vigenere-cipher">https://www.dcode.fr/vigenere-cipher</a> to quickly decode the cipher.</p><br>
+    <img src="../images/k4final.png"><br><br>
+    <p>So we have the password for level 5 is <strong>CLEAR TEXT</strong></p>
+    <hr />
+    <br>
+    <a id="5to6"></a>
+    <h1>Level 5 to Level 6</h1>
+    <p>For this level, we are told that we have another polyalphabetic cipher, but this time the key size is unknown.</p><br>
+    <p>To find the unknown keylength, we have to do what is known as <strong>Kasiski's Method</strong>. The idea behind this method is that we search the ciphertext for 
+    repeated fragments, then compile a list of distances that separate the repetitions. The keyword length is likely to divide many of these distances. This is explained in further detail at <a href="https://pages.mtu.edu/~shene/NSF-4/Tutorial/VIG/Vig-Kasiski.html">https://pages.mtu.edu/~shene/NSF-4/Tutorial/VIG/Vig-Kasiski.html</a></p><br>
+    <p>To quickly find repeated fragments, I am going to use <a href="http://www.richkni.co.uk/php/crypta/freq.php">http://www.richkni.co.uk/php/crypta/freq.php</a> again. Putting the contents of <strong>found1</strong> into the site, we get:</p><br>
+    <img src="../images/k5freq.png"><br><br>
+    <p>Now we can find the distances between these sequences. For the fragment <strong>"GNX"</strong>, we see it appear at the indexes <strong>[5, 347, 527, 545, 653, 1229]</strong>. This gives us 
+    the distance between the sequences as <strong>[342, 180, 18, 108, 576]</strong>. The length of the key is likely to be something that divides these distances, otherwise known as the Greatest Common Divisor (GCD)</p><br>
+    <p>The GCD of these distances is <strong>GCD(342, 180, 18, 108, 576) = 18</strong>. So the length of the key could be 18. Let's also try the other sequences that we got to be sure.</p>
+    <img src="../images/k5f1.png">
+    <img src="../images/k5f2.png">
+    <img src="../images/k5f3.png"><br><br>
+    <p>Now we make the guess that the keylength is 9, given the information we have. We can preform the same analysis as last level, assuming keylength of 9. I used python for this, where we find the most common letter for the index and find the key's letter that would create that cipher. I have also removed the spaces of <strong>found1</strong> so that the indices are correct.</p><br>
+    <img src="../images/k5py.png"><br><br>
+    <p>Running that, we get the possible key as <strong>XEYLENCTH</strong>. Running the same script on <strong>found2</strong> we get the key <strong>KOYLENVTQ</strong>, and on <strong>found3</strong> we get <strong>YEULERGTH</strong></p><br>
+    <p>Now, we can preform further analysis or simply take an educated guess. Looking at the results from <strong>found1</strong> and <strong>found2</strong>, it seems as if the key is <strong>KEYLENGTH</strong>. 
+    Checking this on <strong>found1</strong>, we get the decrypted plaintext:</p><br>
+    <img src="../images/k5dec.png"><br><br>
+    <p>A Charlie Dickens quote from A Tale of Two Cities. Now we can decrypt <strong>krypton6</strong></p><br>
+    <img src="../images/k5decrypt.png"><br><br>
+    <p>So we have the password for level 6 is <strong>RANDOM</strong></p>
+    <hr />
+    <br>
+    <a id="6to7"></a>
+    <h1>Level 6 to Level 7</h1><br>
+    <p>For this level, we are told that the cipher differs from previous levels. Firstly, the cipher is now a stream cipher. This means that 
+        instead of using a fixed size key throughout the plaintext, the key is generated on-the-fly using a random number generator.
+    </p><br>
+    <p>In the directory, we see the binary <strong>encrypt6</strong>, this has the will encrypt the given plaintext into ciphertext using <strong>keyfile.dat</strong> as the key.</p><br>
+    <p>We are given that this challenge may be difficult given that the key is randomly generated. Fortunately, looking at <strong>HINT2</strong>, we are told the random number generator is an 8 bit Linear Shift Feedback Register.</p><br>
+    <p>A linear shift feedback register is a relatively weak way of generating pseudo-random numbers. The main fault is that for an <strong>n</strong> bit LSFR, the pseudo-random numbers cycle, at a maximum, every <strong>2<sup>n</sup> - 1</strong> states. So for our 8 bit LSFR, we can expect the numbers to cycle every 255 or less numbers. Now we can look at exactly how many states it takes before the numbers 
+    cycle by encrypting a long string of the same letter and looing for a pattern.</p><br>
+    <p>For this, we will write a string of length 256, which guarantees the ciphered text will cycle at least 1 letter.</p><br>
+    <img src="../images/k6cipher1.png"><br><br>
+    <p>We can see the pattern <strong>EICTDGYIYZKTHNSIRFXYCPFUEOCKRN</strong> appear, which is 30 characters long, this means that out 8 bit LSFR cycles every 30 numbers.</p><br>
+    <p>To decrypt the file, we have to look at the behaviour one more time, this time we encrypt the character <strong>B</strong> repeatedly.</p><br>
+    <img src="../images/k6cipher2.png"><br><br>
+    <p>So comparing the first letters of each cipher, the cipher sent <strong>A to E</strong> and <strong>B to F</strong>. So the cipher also increases according to the letter's position in the alphabet. 
+    It should also be noted that in comparing the 10<sup>th</sup> letter of the cipher, the letter <strong>A</strong> is sent to <strong>Z</strong> and <strong>B</strong> is sent to <strong>A</strong>. 
+This means that the cipher is also circular and that we are working with the plain alphabet.</p><br>
+    <p>So to break the cipher, we can use the results of the first cipher which we will simply call <strong>cipher</strong>. For each letter in <strong>krypton7</strong>, we subtract from it 
+    the next letter in <strong>cipher</strong>, and subtract again the value of the letter <strong>A</strong>, since we used that letter to generate <strong>cipher</strong>. Then, so as to 
+keep the letters in the alphabet, is the result is less than <strong>A</strong>, according to the ASCII chart, we add 26. This gives us the corresponding plaintext letter. The C code below shows the steps.</p><br>
+    <img src="../images/k6Cdecrpyt.png"><br><br>
+    <p>Running the code, we get the final decrypted password, <strong>LSFRISNOTRANDOM</strong>.</p>
+
+
+</body>
+</html>

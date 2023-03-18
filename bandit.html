@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">   
+        <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    </head>
+    <body>
+    <title>OverTheWire Bandit</title>
+    <!-- <div id="navbar">
+        <div class="cube">
+            <div class="top"></div>
+            <div class="right"></div>
+            <div class="bottom"></div>
+            <div class="left"></div>
+            <div class="front"></div>
+            <div class="back"></div>
+          </div>
+        <a href="index.html">Home</a>
+        <a href="writeups.html">Writeups</a>
+    </div> -->
+    <!-- <script src="stickyNav.js"></script> -->
+    <br>
+    <h1>OverTheWire Bandit</h1>
+    <hr />
+    <p>
+        Bandit is meant as a starting point for absolute beginners. As such, the challenges are less
+        meant to challenge a person than they are to push them towards a correct train of thought for completing future wargames. 
+    </p>
+    <br>
+    
+    <div class="c2">
+        All Bandit Levels:
+    <a href="#0">Level 0</a>
+    <a href="#0to1">Level 0 to 1</a>
+    <a href="#1to2">Level 1 to 2</a>
+    <a href="#2to3">Level 2 to 3</a>
+    <a href="#3to4">Level 3 to 4</a>
+    <a href="#4to5">Level 4 to 5</a>
+    <a href="#5to6">Level 5 to 6</a>
+    <a href="#6to7">Level 6 to 7</a>
+    <a href="#7to8">Level 7 to 8</a>
+    <a href="#8to9">Level 8 to 9</a>
+    <a href="#9to10">Level 9 to 10</a>
+    <a href="#10to11">Level 10 to 11</a>
+    <a href="#11to12">Level 11 to 12</a>
+    <a href="#12to13">Level 12 to 13</a>
+    <a href="#13to14">Level 13 to 14</a>
+    <a href="#14to15">Level 14 to 15</a>
+    <a href="#15to16">Level 15 to 16</a>
+    <a href="#16to17">Level 16 to 17</a>
+    <a href="#17to18">Level 17 to 18</a>
+    <a href="#18to19">Level 18 to 19</a>
+    <a href="#19to20">Level 19 to 20</a>
+    <a href="#20to21">Level 20 to 21</a>
+    <a href="#21to22">Level 21 to 22</a>
+    <a href="#22to23">Level 22 to 23</a>
+    <a href="#23to24">Level 23 to 24</a>
+    <a href="#24to25">Level 24 to 25</a>
+    <a href="#25to26">Level 25 to 26</a>
+    <a href="#26to27">Level 26 to 27</a>
+    <a href="#27to28">Level 27 to 28</a>
+    <a href="#28to29">Level 28 to 29</a>
+    <a href="#29to30">Level 29 to 30</a>
+    <a href="#30t031">Level 30 to 31</a>
+    <a href="#31to32">Level 31 to 32</a>
+    <a href="#32to33">Level 32 to 33</a>
+    <a href="#33to34">Level 33 to 34</a>
+
+    </div>
+
+    <br>
+    <a id="0"></a>
+    <p>
+        Lets get started at the beginning.
+    </p>
+    <br><br>
+    <h1>Level 0</h1>
+    <br>
+    <p>This level acts as an intro on how to connect to future levels. All you need to do is 
+        connect via ssh to <strong>bandit0</strong> on the host <strong>bandit.labs.overthewire.org</strong> on port 2220
+        with the password <strong>bandit0</strong>.
+    </p>
+    <br>
+    <img src="images/b0login.png">
+    <hr />
+    <br>
+    <a id="0to1"></a>
+    <h1>Level 0 to Level 1</h1>
+    <br>
+    <p>
+        When logged into Bandit0, open the file <strong>readme</strong>.
+    </p>
+    <br>
+    <img src="images/b1PW.png">
+    <br><br>
+    <p>The password for level 1 is <strong>boJ9jbbUNNfktd78OOpsqOltutMc3MY1</strong></p>
+    <hr />
+    <br>
+    <a id="1to2"></a>
+    <h1>Level 1 to Level 2</h1>
+    <br>
+    <p>
+        When looking what's in Bandit1, we can see only 1 file.
+    </p>
+    <br>
+    <img src="images/b1ls.png">
+    <br><br>
+    <p>
+        The trip up here is in Unix style programs, arguments are options if they begin with a hyphen delimiter ('-').
+        So the problem is that calling <strong>cat -</strong> does nothing as the program believes there is an expected option after the hyphen.
+        The easy fix is to use <strong>./</strong> before the filename, denoting a file in the current working directory. 
+    </p>
+    <br>
+    <img src="images/b1cat.png">
+    <br><br>
+    <p>The password for the next level is <strong>CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9</strong></p>
+    <hr />
+    <br>
+    <a id="2to3"></a>
+    <h1>Level 2 to Level 3</h1>
+    <br>
+    <p>We see only 1 file in Bandit2</p>
+    <br>
+    <img src="images/b2ls.png">
+    <br><br>
+    <p>All we need to do is escape the spaces with backslashes to read the file.</p>
+    <br>
+    <img src="images/b2cat.png">
+    <br><br>
+    <p>The password for level3 is <strong>UmHadQclWmgdLOKQ3YNgjWxGoRMb5luK</strong></p>
+    <hr />
+    <br>
+    <a id="3to4"></a>
+    <h1>Level 3 to Level 4</h1>
+    <br>
+    <p>
+        We just change directory into the <strong>inhere</strong> directory and view the all the contents
+    </p>
+    <br>
+    <img src="images/b3cd.png">
+    <br><br>
+    <p>
+        And the password is in the file we see there.
+    </p>
+    <br>
+    <img src="images/b3cat.png">
+    <br><br>
+    <p>The password for level 4 is <strong>pIwrPrtPN36QITSp3EQaw936yaFoFgAB</strong></p>
+    <hr />
+    <br>
+    <a id="4to5"></a>
+    <h1>Level 4 to Level 5</h1>
+    <br>
+    <p>The password for this level is the only human-readable file in the <strong>inhere</strong> directory</strong></p>
+    <p>This can be the introduction to <strong>shell scripting</strong> in bash (Bourne Again Shell)</p>
+    <br>
+    <img src="images/b4cat.png">
+    <br><br>
+    <p>So we have that the password for level 5 is <strong>koReBOKuIDDepwhWk7jZC0RTdopnAYKh</strong></p>
+    <hr />
+    <br>
+    <a id="5to6"></a>
+    <h1>Level 5 to Level 6</h1>
+    <br>
+    <p>For the next challenge, we are told that the correct password is in a file somewhere in the <strong>inhere</strong> directory that has the following properties: </strong></p>
+    <ul>
+        <li>human-readable</li>
+        <li>1033 bytes in size</li>
+        <li>not executable</li>
+    </ul>
+    <p>We can use the <strong>find</strong> command to recursively look at all files in subdirectories. We can also use <strong>find</strong>
+    to execute a command with every file it lists, in this case, we use the <strong>stat</strong> command to look at the total size in bytes. Finally 
+We use <strong>grep</strong> on the output and see which file is exactly 1033 bytes.</p>
+<br>
+    <img src="images/b5cmd.png">
+    <br><br>
+    <p>The password for level 6 is <strong>DXjZPULLxYr17uwoI01bNLQbtFemEgo7</strong></p>
+    <hr />
+    <br>
+    <a id="6to7"></a>
+    <h1>Level 6 to Level 7</h1>
+    <br>
+    <p>We are given the hint that the password for level 7 is somewhere on the server and has the following properties:</p>
+    <ul>
+        <li>owned by user bandit7</li>
+        <li>owned by group bandit6</li>
+        <li>33 bytes in size</li>
+    </ul>
+    <p>The first thing we do is navigate to the root directory to properly look at all files</p>
+    <br>
+    <img src="images/b6cd.png">
+    <br><br>
+    <p>Next we recursively list all files, filtering for the pattern "bandit7 bandit6" which the command <strong>ls -l</strong> gives out as user and group, respectively.
+    There are also many directories we don't have permission to look at so to clean the output, direct error messages to /dev/null.
+    </p>
+    <br>
+    <img src="images/b6ls.png">
+    <br><br>
+    <p>We see a file matching all the criteria, so we just have to find the <strong>find</strong>
+    the file and see the contents.
+    </p>
+    <br>
+    <img src="images/b6cat.png">
+    <br><br>
+    <p>We see the password for level 7 is <strong>HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs</strong></p>
+    <hr />
+    <br>
+    <a id="7to8"></a>
+    <h1>Level 7 to Level 8</h1>
+    <br>
+    <p>We have the hint that the password is in <strong>data.txt</strong>
+    next to the word <strong>millionth</strong></strong>
+    </p>
+    <br>
+    <img src="images/b7grep.png">
+    <br><br>
+    <p>So we have the password for level 8 is <strong>cvX2JJa4CFALtqS87jk27qwqGhBM9plV</strong>
+    </p>
+    <hr />
+    <br>
+    <a id="8to9"></a>
+    <h1>Level 8 to Level 9</h1><br>
+    <p>We are told that the password for the next level is in <strong>data.txt</strong>
+    and is the only unique line in the file. We find the line by sorting the file and then using the program <strong>uniq</strong>
+    on the file.</p><br>
+    <img src="images/b8uniq.png"><br><br>
+    <p>So the password to level 9 is <strong>UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR</strong></p>
+    <hr />
+    <br>
+    <a id="9to10"></a>
+    <h1>Level 9 to Level 10</h1><br>
+    <p>We are given that the password is located in <strong>data.txt</strong>, 
+    is one of the few human readable strings, and is proceded by serveral <strong>'='</strong> characters.</p><br>
+    <p>We use <strong>strings</strong> program this time instead of <strong>cat</strong> so that
+    we only get human readable strings out. Then we <strong>grep</strong> for some <strong>'='</strong>
+characters</p><br>
+    <img src="images/b9grep.png"><br><br>
+    <p>We see the password for level 10 is <strong>truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk</strong></p>
+    <hr />
+    <br>
+    <a id="10to11"></a>
+    <h1>Level 10 to Level 11</h1><br>
+    <p>The password is in <strong>data.txt</strong> and is base64 encoded. This means we just use <strong>base64 -d</strong>
+    to decode the data.</p><br>
+    <img src="images/b10b.png"><br><br>
+    <p>We see the password for level 11 is <strong>IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR</strong></p>
+    <hr />
+    <br>
+    <a id="11to12"></a>
+    <h1>Level 11 to Level 12</h1><br>
+    <p>We are given that the password is located in <strong>data.txt</strong> and that
+    the letters have been rotated 13 positions</p><br>
+    <p>We can use <strong>tr</strong>, a program meant for translating characters to do the rot13 algorithm.</p><br>
+    <img src="images/b11rot.png"><br><br>
+    <p>The password for level 12 is <strong>5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu</strong></p>
+    <hr />
+    <br>
+    <a id="12to13"></a>
+    <h1>Level 12 to Level 13</h1><br>
+    <p>We are given that the data is stored in <strong>data.txt</strong> and that it is a hexdump of a compressed file.</p><br>
+    <img src="images/b12cat.png"><br><br>
+    <p>We can use the tool <strong>xxd -r</strong> to reverse the hexdump and store the result in a file <strong>data2</strong>. 
+    We also need to work in a temporary directory for this step.</p><br>
+    <img src="images/b12tmp.png"><br><br>
+    <p>Calling <strong>file</strong> on the new file, we can see it was a gzip compressed file. So we change the filename and undo the compression.</p><br>
+    <img src="images/b12gz.png"><br><br>
+    <p>Looking at the new file, we can see it is bzip2 compressed. We seem to reach a point of checking the compression type, changing the file extension and
+        applying the proper decompression.
+    </p><br>
+    <img src="images/b12d.png"><br><br>
+    <p>We reach the end of the loop and find the password for level 13 is <strong>8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL</strong></p>
+    <hr />
+    <br>
+    <a id="13to14"></a>
+    <h1>Level 13 to Level 14</h1><br>
+    <p>We are told that the password to level 14 is stored in <strong>/etc/bandit_pass/bandit14</strong>, 
+        but it can only be read by user <strong>bandit14</strong>.</p><br>
+    <p>We can see that we are given an ssh private key for bandit14, copy this to a text file on your local machine.</p><br>
+    <img src="images/b13key.png"><br><br>
+    <p>Now we set the correct permissions for the key and use it to log into <strong>bandit14</strong>.</p><br>
+    <img src="images/b13log.png"><br><br>
+    <p>The all that's left to do is read the password now that we are the correct user.</p><br>
+    <img src="images/b13cat.png"><br><br>
+    <p>So the password for level 14 is <strong>4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e</strong></p>
+    <hr />
+    <br>
+    <a id="14to15"></a>
+    <h1>Level 14 to Level 15</h1><br>
+    <p>We are told that we will get the password for level 15 if we send level 14's password 
+        to <strong>port 30000 on localhost</strong>
+    </p><br>
+    <p>This is simple to do with <strong>netcat</strong> using the command <strong>nc</strong></p><br>
+    <img src="images/b14nc.png"><br><br>
+    <p>So the password for level 15 is <strong>BfMYroe26WYalil77FoDi9qh59eK5xNr</strong></p>
+    <hr />
+    <br>
+    <a id="15to16"></a>
+    <h1>Level 15 to Level 16</h1><br>
+    <p>We are told that the password for the next level can be retrieved by submitting the current level's 
+        password to <strong>port 30001 on localhost using SSL encryption</strong>
+    </p>
+    <br>
+    <p>For this we cannot use <strong>nc</strong> as it does not support SSL encryption. Instead we make use of
+    <strong>openssl</strong> to make the connection. </p>
+    <br>
+    <p>The format of the command for a connection is </p> <br>
+    <p><strong>openssl s_client -connect host:port</strong></p><br>
+    <img src="images/b15ssl.png"><br><br>
+    <p>Then we submit the password of the current level and wait for the reponse.</p><br>
+    <img src="images/b15pass.png"><br><br>
+    <p>We can see the password for level 16 is <strong>cluFn7wTiGryunymYOu4RcffSxQluehd</strong></p>
+    <hr />
+    <br>
+    <a id="16to17"></a>
+    <h1>Level 16 to Level 17</h1><br>
+    <p>We are told that we can retrieve the credentials for the next level if we submit 
+        the current password to a <strong>port on localhost in the range 31000 to 32000</strong>
+    </p>
+    <br>
+    <p>We can start by using <strong>nmap</strong> with service detection to see which ports are open and using SSL.</p><br>
+    <img src="images/b16nmap.png">
+    <br><br>
+    <p>We can see that port <strong>31790</strong> gave <strong>nmap</strong> trouble in detecting the service.
+     Looking closer we can see that it is asking for password as input.</p>
+     <br>
+     <img src="images/b16key.png">
+     <br><br>
+     <p>We are given the private key to log into <strong>bandit17</strong></p>
+     <hr />
+     <br>
+     <a id="17to18"></a>
+     <h1>Level 17 to Level 18</h1><br>
+     <p>We are told that there are 2 files in the home directory, <strong>password.old</strong>
+     and <strong>password.new</strong> and that the password is the only life that has changed between them.</p>
+    <br>
+    <p>We can use the command <strong>diff</strong> to see differences between files.</p><br>
+    <img src="images/b17diff.png">
+    <br><br>
+    <p>So we see the password the level 18 is <strong>kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd</strong></p>
+    <br>
+    <hr />
+    <br>
+    <a id="18to19"></a>
+    <h1>Level 18 to Level 19</h1><br>
+    <p>We are told that the password for the next level is in the home directory in a file called <strong>readme</strong>.</p><br>
+    <p>Unfortunately, the bashrc has been modified so that we are logged out when we log in with SSH.</p><br>
+    <img src="images/b18ssh.png"><br><br>
+    <img src="images/b18bye.png"><br><br>
+    <p>We can solve this by sending a command along with the SSH login to execute.</p><br>
+    <img src="images/b18cat.png"><br><br>
+    <p>So we see that the password for level 19 is <strong>IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x</strong></p>
+    <hr />
+    <br>
+    <a id="19to20"></a>
+    <h1>Level 19 to Level 20</h1><br>
+    <p>For this challenge we are told that we need to use the setuid binary in the home directory to view the password for the next level.</p><br>
+    <p>The password is stored in the file <strong>/etc/bandit_pass/bandit20</strong></p><br>
+    <p>We can look at the file permissions and see <strong>bandit20</strong> has read permissions on the file.</p><br>
+    <img src="images/b19ls.png"><br><br>
+    <p>Using the <strong>bandit20-do</strong> binary, we can view the file as <string>bandit20</string></p><br>
+    <img src="images/b19cat.png"><br><br>
+    <p>So we have that the password for level 20 is <strong>GbKksEFF4yrVs6il55v6gwY5aVje5f0j</strong></p>
+    <hr />
+    <br>
+    <a id="20to21"></a>
+    <h1>Level 20 to Level 21</h1><br>
+    <p>We are told that there is a binary <strong>suconnect</strong> that takes a port as an argument. It reads a line of text from the connection and if it is level 20's password, it will send level 21's password as a response.</p><br>
+    <p>For this we need to set a simple TCP server with <strong>nc</strong> and have it <strong>echo</strong> the line out in the background.</p><br>
+    <img src="images/b20nc.png"><br><br>
+    <p>Then we run the binary on port 9999</p><br>
+    <img src="images/b20su.png"><br><br>
+    <p>So we see the password for level 21 is <strong>gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr</strong></p>
+    <hr />
+    <br>
+    <a id="21to22"></a>
+    <h1>Level 21 to Level 22</h1><br>
+    <p>We are told that a <strong>cronjob</strong> is running at regular intervals and to look at <strong>/etc/cron.d</strong> for the configuration to see what is being executed.</p><br>
+    <p>Looking in <strong>/etc/cron.d</strong>, we see a cronjob: <strong>cronjob_bandit22</strong></p><br>
+    <img src="images/b21cd.png"><br><br>
+    <p>Looking at <strong>cronjob_bandit22</strong>, we see that it is executing <strong>/usr/bin/cronjob_bandit22.sh</strong>
+    and throwing away the output. Looking at <strong>/usr/bin/cronjob_bandit22.sh</strong>, we can see what it is executing.</p><br>
+    <img src="images/b21cat.png"><br><br>
+    <p>We see that it is throwing the password into a temp folder. Looking at that file we find the password.</p><br>
+    <img src="images/b21p.png"><br><br>
+    <p>So the password for level 22 is <strong>Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI</strong></p>
+    <hr />
+    <br>
+    <a id="22to23"></a>
+    <h1>Level 22 to Level 23</h1>
+    <br>
+    <p>We are told again that there is a cronjob in <strong>/etc/cron.d</strong> whose configuration will lead us to the password.</p><br>
+    <p>Looking in the folder we find <strong>cronjob_bandit23</strong>, which executes <strong>/usr/bin/cronjob_bandit23.sh</strong></p><br>
+    <p>Looking at that file we see the following script:</p><br>
+    <img src="images/b22cd.png"><br><br>
+    <p>So the password for <strong>bandit23</strong> is being written to <strong>/tmp/$mytarget</strong></p><br>
+    <p>To find the password, we have to find the value of <strong>$mytarget</strong> and read the appropriate file.</p><br>
+    <img src="images/b22cat.png"><br><br>
+    <p>We see that the password for level 23 is <strong>jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n</strong></p>
+    <hr />
+    <br>
+    <a id="23to24"></a>
+    <h1>Level 23 to Level 24</h1><br>
+    <p>We are told similarly about a cronjob and a script that is executed for bandit24</p><br>
+    <img src="images/b23cd.png"><br><br>
+    <p>The script executes anything in <strong>/var/spool/bandit24</strong> and then deletes the file.</p><br>
+    <p>So we need to make a script that when executed, puts the password from <strong>/etc/bandit_pass/bandit24</strong> into a file where we can read it.</p><br>
+    <p>To start, lets make a temp directory to work in and set up our script.</p><br>
+    <img src="images/b23mkdir.png"><br><br>
+    <p>The we can write a simple script to grab the password and put in in our temp folder.</p><br>
+    <img src="images/b23vim.png"><br><br>
+    <p>Then we create a blank file where the password will be stored. We also need to change the permissions for 
+        the files so that can read, write and execute.
+    </p><br>
+    <img src="images/b23chmod.png"><br><br>
+    <p>Then we put our script in <strong>/var/spool/bandit24</strong> and wait for about a minute for it to execute.</p><br>
+    <img src="images/b23getpass.png"><br><br>
+    <p>So we can see that the password for level 24 is <strong>UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ</strong></p>
+    <hr />
+    <br>
+    <a id="24to25"></a>
+    <h1>Level 24 to Level 25</h1><br>
+    <p>We are told that a daemon is listening on port 30002 and will give us the password for level 25 is we send it 
+        the password for level 24 and a correct 4 digit pincode.
+    </p><br>
+    <p>We have to brute force the pincode, which is luckily only 10,000 combinations. To do this, we can loop over all numbers from 1 to 9999 and send them to port 30002 using <strong>netcat</strong>. 
+    We also will get back a lot of wrong responses, so we can use <strong>grep -v Wrong</strong> to only give us output that does not contain the word wrong.</p><br>
+    <img src="images/b24.png"><br><br>
+    <p>So we see that the password for level 25 is <strong>uNG9O58gUE7snukf3bvZ0rxhtnjzSGzG</strong></p>
+    <hr />
+    <br>
+    <a id="25to26"></a>
+    <h1>Level 25 to Level 26</h1><br>
+    <p>In level 25's home directory, we see a private key to ssh into <strong>bandit26</strong>. We are also told that the shell for <strong>bandit26</strong>
+    is not <strong>/bin/bash</strong>, but something else. We can see which shells users are using by looking at <strong>/etc/passwd</strong>.</p><br>
+    <img src="images/b25passwd.png"><br><br>
+    <p>So it turns out that bandit26 is using <strong>/usr/bin/showtext</strong> as it's shell. Looking at that we can see that is essentially executes <strong>more</strong> on text.txt and exits.</p><br>
+    <img src="images/b25showtext.png"><br><br>
+    <p>When trying to log into <strong>bandit26</strong>, we confirm this.</p><br>
+    <img src="images/b25log1.png"><br>
+    <img src="images/b25log2.png"><br><br>
+    <p>The trick here is to reduce the size of your terminal so that we can get the "more" prompt, as it will not be able to show the whole of <strong>~/text.txt</strong>. Issuing the ssh command 
+    with a terminal size of 6 lines, we get the prompt.</p><br>
+    <img src="images/b25term.png"><br><br>
+    <p>After that we can make the terminal whatever size you prefer again.</p><br>
+    <p>We can now make use of commands we can execute in <strong>more</strong>. We cannot use the <strong>!cmd</strong> command as it will execute a command with the current shell, 
+    which is currently still not bash. We get around this by opening the file in vi by entering <strong>v</strong> into the more command. This brings up the vi text editor with <strong>~/text.txt</strong></p><br>
+    <img src="images/b25vi.png"><br><br>
+    <p>Now in vi, we can use the <strong>sh</strong> command to enter a child shell. First, however, we need to change the shell to bash.</p><br>
+    <img src="images/b25setshell.png"><br><br>
+    <p>The enter <strong>sh</strong> to drop into a shell.</p><br>
+    <img src="images/b25shell.png"><br><br>
+    <p>The we can find the password to level 26 the same as usual, in <strong>/etc/bandit_pass/bandit26</strong>.</p><br>
+    <img src="images/b25passfound.png"><br><br>
+    <p>So we have the password to level 26 is <strong>5czgV9L3Xx8JPOyRbXh6lQbmIOWvPT6Z</strong>. However we will stay in the shell to progress to level 27.</p>
+    <hr />
+    <br>
+    <a id="26to27"></a>
+    <h1>Level 26 to Level 27</h1><br>
+    <p>This is a relatively simple level. All we have to do is use the <strong>bandit27-do</strong> binary to read the next level's password.</p><br>
+    <img src="images/b26cat.png"><br><br>
+    <p>So we have the password for level 27 is <strong>3ba3118a22e93127a4ed485be72ef5ea</strong></p>
+    <hr />
+    <br>
+    <a id="27to28"></a>
+    <h1>Level 27 to Level 28</h1><br>
+    <p>We are told that there is a git repository at <strong>ssh://bandit27-git@localhost/home/bandit27-git/repo</strong> and that the password is the same as 
+    this level's password.</p><br>
+    <p>We will use <strong>git clone</strong> in a temp directory to see the contents of the repository</p><br>
+    <img src="images/b27git.png"><br><br>
+    <p>So the password for level 28 is <strong>0ef186ac70e04ea33b4c1853d2526fa2</strong></p>
+    <hr />
+    <br>
+    <a id="28to29"></a>
+    <h1>Level 28 to Level 29</h1><br>
+    <p>Similar to last level, there is a git repository and we are told to find the password. First clone the git repository into t a temp folder.</p><br>
+    <img src="images/b28gitclone.png"><br><br>
+    <p>We see a readme file in the <strong>repo</strong> folder, looking at it we see the password has been hidden.</p><br>
+    <img src="images/b28readme.png"><br><br>
+    <p>We can when the repository was changed by using the <strong>git log</strong> command</p><br>
+    <img src="images/b28gitlog.png"><br><br>
+    <p>We can see that at commit c086d11a00c0648d095d04c089786efef5e01264, the password was likely added.</p><br>
+    <p>To get the password, we can use <strong>git diff</strong> on the first and second commits and see what was changed.</p><br>
+    <img src="images/b28diff.png"><br><br>
+    <p>So we have that the password for level 29 is <strong>bbc96594b4e001778eee9975372716b2</strong></p>
+    <hr />
+    <br>
+    <a id="29to30"></a>
+    <h1>Level 29 to Level 30</h1><br>
+    <p>For this level, we once again clone a git repository into a temp directory.</p><br>
+    <img src="images/b29clone.png"><br><br>
+    <p>Looking at the readme file, we see that the password has not been added in yet.</p><br>
+    <img src="images/b29cat.png"><br><br>
+    <p>We can try the same logic as last level and see the changes between commits. Unfortunately there was no changes of interest.</p><br>
+    <img src="images/b29gitdiff.png"><br><br>
+    <p>Our next idea is that maybe there are different branches of this repository, and that the password was added in on one of those. To check this, we can use the 
+        <strong>git branch -a</strong> command to list all the branches.
+    </p><br>
+    <img src="images/b29branch.png"><br><br>
+    <p>We see serveral remote branches, we can switch to another branch by using the <strong>git checkout</strong> command.</p><br>
+    <img src="images/b29checkout.png"><br><br>
+    <p>So it turns out the <strong>dev</strong> branch had the password for level 30, which is <strong>5b90576bedb2cc04c86a9e924ce42faf</strong></p>
+    <hr />
+    <br>
+    <a id="30to31"></a>
+    <h1>Level 30 to Level 31</h1><br>
+    <p>We are told again to clone a git repository from <strong>ssh://bandit30-git@localhost/home/bandit30-git/repo</strong>.</p><br>
+    <img src="images/b30clone.png"><br><br>
+    <p>Looking at the readme file, we see that it sadly doesn't contain the password as we would've hoped.</p><br>
+    <img src="images/b30catreadme.png"><br><br>
+    <p>We can try the same logic as before, looking at the branches, we see it only comes from master. Likewise, checking the logs, there is only 1 commit made in this file.</p><br>
+    <img src="images/b30branchlog.png"><br><br>
+    <p>The idea of this challenge is to introduce us to the idea of tagging. Tagging is used to mark points in the repository's lifespan that were important. 
+    Examples include "version 1.0" to "version 2.0" or something similar. Tags can be shown in the repository by running the <strong>git tag</strong> command.</p><br>
+    <img src="images/b30tag.png"><br><br>
+    <p>So this repository has a tag calleg "secret". We can look at the contents of the tag by running <strong>git show</strong>.</p><br>
+    <img src="images/b30secret.png"><br><br>
+    <p>We get back the password for level 31, which is <strong>47e603bb428404d265f59c42920d81e5</strong></p>
+    <hr />
+    <br>
+    <a id="31to32"></a>
+    <h1>Level 31 to Level 32</h1><br>
+    <p>For this challenge, we again clone a git repository.</p><br>
+    <img src="images/b31clone.png"><br><br>
+    <p>Then we can take a look the the readme file.</p><br>
+    <img src="images/b31readme.png"><br><br>
+    <p>So we are told to push a file, <strong>key.txt</strong> to the master branch.</p><br>
+    <p>Lets set up the file and try to stage it for a commit and push.</p><br>
+    <img src="images/b31gitadd.png"><br><br>
+    <p>We saw that we were denied by the <strong>.gitignore</strong> file from adding <strong>key.txt</strong>, so we can to use the -f option to override <strong>.gitignore</strong></p><br>
+    <p>Finally, all we have to do is make a commit with out staged file and push the commit to the master branch.</p><br>
+    <img src="images/b31push.png"><br><br>
+    <p>And we got the password for level 32, which is <strong>56a9bf19c63d650ce78e6ec0354ee45e</strong></p>
+    <hr />
+    <br>
+    <a id="32to33"></a>
+    <h1>Level 32 to Level 33</h1>
+    <p>When we log into bandit33, we are thrown into the "UPPERCASE SHELL". We quickly find that commands to not work in this shell and that we need a way out.</p><br>
+    <img src="images/b32upp.png"><br><br>
+    <p>We get a shell by entering <strong>$0</strong> ino the uppercase shell. We can see to use this as the script is interactive, calling sh on the commands we provide it. 
+        The <strong>$0</strong> variable denotes the first argument of a command, which we can see is <strong>sh</strong>.</p><br>
+    <img src="images/b32sh.png"><br><br>
+    <p>It worked, and we were dropped into an sh shell. We then can swich to bash for some extra comfort. Next is to try and read the password file for bandit33, stored in the usual place.</p><br>
+    <img src="images/b32catpass.png"><br><br>
+    <p>So we got the password for level 33, which is <strong>c9c3199ddf4121b10cf581a98d51caee</strong></p>
+    <hr />
+    <br>
+    <a id="33to34"></a>
+    <h1>Level 33 to Level 34</h1><br>
+    <p>For the last level, we get a nice message congradulating us on finishing the game.</p><br>
+    <img src="images/banditlast.png">
+</body>
+</html>
