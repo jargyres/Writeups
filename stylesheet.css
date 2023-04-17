@@ -32,7 +32,7 @@ body {
     line-height: 14px;
 }
 
-h1, p, li {
+h1, h2, h3, h4, p, li {
     margin: 0;
     color: #ffffff;
 }
@@ -40,6 +40,9 @@ h1, p, li {
 /* div {
     color: #84c754;
 } */
+code{
+    color: #d0ffaf;
+}
 
 strong{
     color: #9bff53;

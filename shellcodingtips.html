@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">   
+        <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+    </head>
+    <body>
+    <title>Shellcoding Tips for Modern Linux</title>
+    <br>
+    <h1>Shellcoding Tips for Modern Linux</h1>
+    <hr />
+    <p>
+        While working through <a href="https://doc.lagout.org/security/The%20Shellcoder%E2%80%99s%20Handbook.pdf">The Shellcoder's Handbook</a>, I found myself looking up many ways to get their examples working on my machine.<br><br>
+        Here is a couple of settings and tips I found to make your life a little easier.
+    </p>
+    <br>
+    
+    <div class="c2">
+    <a href="#disableALSR">Disabling ASLR</a>
+    <a href="#gccFlags">GCC Flags</a>
+    <a href="#compilingShellcode">Compiling Shellcode</a>
+    </div>
+    <br><br><br>
+
+    <a id="disableALSR"></a>
+    <h1><u>Disabling ALSR</u></h1><br>
+    <p>Address Space Layout Randomization (ALSR) is a memory-exploitation mitigation technique used on both Windows and Linux systems in order to prevent an attacker from reliably jumping to an area in memory, possibly to move execution to a exploited function</p><br>
+    <p>The Linux PaX project first coined the term ALSR and implemented the first design of ALSR in 2001, as a patch for the Linux kernel</p><br>
+    <p>The Linux kernel has included a form of ALSR by default since kernel version 2.6.12, released in 2005</p><br>
+    <p>Read more about the internals of implementations of ALSR in a presentation titled: <a href="https://grsecurity.net/PaX-presentation.pdf">The Guaranteed End of Arbitrary Code Execution</a> by the PaX group.</p><br>
+    <h3><u>Problems Arising with ALSR</u></h3><br>
+    <p>In order to execute shellcode, we need to find out the starting address of our shellcode.</p><br>
+    <p>There are several modern methods to find this information while running, such as a jump in the shellcode for relative positioning.</p><br>
+    <p>For simple testing, we can simply grab the address of <strong>esp</strong>, the stack pointer, and guess our location.</p><br>
+    <p>A simple C program given in <a href="https://doc.lagout.org/security/The%20Shellcoder%E2%80%99s%20Handbook.pdf">The Shellcoder's Handbook</a>, grabs the address of <strong>esp</strong>.</p><br>
+    <pre><code>
+    //find_start.c
+    unsigned_long find_start(void){
+            __asm__("movl %esp, %eax");
+    }
+    int main(){
+        printf("0x%x\n", find_start());
+    }
+    </code></pre><br>
+    <h3><u>On a ALSR enabled machine (default)</u></h3><br>
+    <pre>
+    <code>
+    jta@desktop:~$ ./find_start
+    0xffc7be40
+    jta@desktop:~$ ./find_start
+    0xffd8a930
+    jta@desktop:~$ ./find_start
+    0xfffc2c20
+    jta@desktop:~$ ./find_start
+    0xff838f00
+    </code>
+    </pre><br>
+    <p>As you can see, ALSR is randomizing where our stack begins every time the program is run.</p><br>
+    <p>There are a couple ways to disable ALSR</p><br>
+    <h4><u>Disable ALSR Permanently</u></h4><br>
+    <p>On Linux, ALSR is controlled using the <code>/proc/sys/kernel/randomize_va_space</code> interface.</p><br>
+    <p>This interface supports the following values:</p><br>
+    <pre>
+    <code>
+    0 – No randomization. Everything is static.
+    1 – Conservative randomization. Shared libraries, stack, mmap(), VDSO, and heap are randomized.
+    2 – Full randomization. In addition to elements listed in the previous point, memory managed through brk() is also randomized. (Default)
+    </code>
+    </pre><br>
+    <p>To turn off ALSR, simply run the command:</p><br>
+    <pre>
+    <code>
+    echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
+    </code>
+    </pre><br>
+    <p>To enable it again run:</p>
+    <pre>
+    <code>
+    echo 2 | sudo tee /proc/sys/kernel/randomize_va_space
+    </code>
+    </pre><br>
+    <p>To disable this permanently (not recommended), you'll have to configure sysctl:</p><br>
+    <pre>
+    <code>
+    touch /etc/sysctl.d/01-disable-aslr.conf
+    echo "kernel.randomize_va_space = 0" >> /etc/sysctl.d/01-disable-aslr.conf
+    </code>
+    </pre><br>
+    <h4><u>Temporarily Disable ALSR (Recommended)</u></h4><br>
+    <p>To temporarily disable ALSR, we can use the <strong>setarch</strong> command</p><br>
+    <p><strong>setarch</strong> will change an architecture or personality flags in an environment.</p><br>
+    <p>We want to use this with the <strong>-R</strong> flag:</p><br>
+    <pre>
+    <code>
+    -R, --addr-no-randomize
+        Disables randomization of the virtual address space. Turns on ADDR_NO_RANDOMIZE.
+    </code>
+    </pre><br>
+    <p>Then we can simply open a new environment with out current architecture without address randomization using:</p><br>
+    <pre>
+    <code>
+    setarch $(uname -m) -R /bin/bash
+    </code>
+    </pre><br>
+    <h3><u>find_start without ALSR</u></h3><br>
+    <pre>
+    <code>
+    jta@desktop:~$ setarch $(uname -m) -R /bin/bash
+    jta@desktop:~$ ./find_start
+    0xffffd1d0
+    jta@desktop:~$ ./find_start
+    0xffffd1d0
+    jta@desktop:~$ ./find_start
+    0xffffd1d0
+    jta@desktop:~$ ./find_start
+    0xffffd1d0
+    </code>
+    </pre><br>
+    <hr />
+    <br>
+    <a id="gccFlags"></a>
+    <h1><u>GCC Flags</u></h1><br>
+    <h3><u>32-Bit</u></h3><br>
+    <p><a href="https://doc.lagout.org/security/The%20Shellcoder%E2%80%99s%20Handbook.pdf">The Shellcoder's Handbook</a> is written in 2007, and as such many of the examples are assuming a 32-bit system.</p><br>
+    <p>In fact, many times shellcode is written assuming a 32-bit architecture, to maximize the portability from x86 and x86_64 systems.</p><br>
+    <p>We want to compile our programs written in C using the 32-bit flag in gcc:</p><br>
+    <pre>
+    <code>
+    -m32
+    -m64
+        Generate code for a 32-bit or 64-bit environment.  The 32-bit environment sets int, long and pointer to 32 bits.  The 64-bit environment
+        sets int to 32 bits and long and pointer to 64 bits.
+    </code>
+    </pre><br>
+    <p>We want to use the <code>-m32</code> option.</p><br>
+    <h3><u>Executable Stack</u></h3><br>
+    <p>Many uses of shellcode involve changing the program flow to pre-made shellcode, which can be stored on the stack</p><br>
+    <p>Making the stack non-executable is a policy enforced in <a href="https://en.wikipedia.org/wiki/W%5EX">W^X</a>, a security feature that states that memory can either be writable or executable, but never both.</p><br>
+    <p>Since we want to execute our own opcodes from the stack, we'll need to pass the option <code>execstack</code> to the linker <code>ld</code>, which is automatically called when invoking <code>gcc</code>:</p><br>
+    <pre>
+    <code>
+    execstack
+        Marks the object as requiring executable stack.
+    </code>
+    </pre><br>
+    <p>We do this by passing the argument <code>-zexecstack</code> to <code>gcc</code></p><br>
+    <h3><u>Disable Stack Smashing Detector</u></h3><br>
+    <p>Since we are wanting to test buffer overflow exploits, we need to turn off the stack protector.</p><br>
+    <p>This option is enabled as default <code>-fstack-protector-strong</code> in Ubuntu 14.10 and later versions.</p><br>
+    <pre>
+    <code>
+    -fstack-protector
+        Emit extra code to check for buffer overflows, such as stack smashing attacks.  This is done by adding a guard variable to functions with
+        vulnerable objects.  This includes functions that call "alloca", and functions with buffers larger than or equal to 8 bytes.  The guards
+        are initialized when a function is entered and then checked when the function exits.  If a guard check fails, an error message is printed
+        and the program exits.  Only variables that are actually allocated on the stack are considered, optimized away variables or variables
+        allocated in registers don't count.
+
+    -fstack-protector-strong
+        Like -fstack-protector but includes additional functions to be protected --- those that have local array definitions, or have references
+        to local frame addresses.  Only variables that are actually allocated on the stack are considered, optimized away variables or variables
+        allocated in registers don't count.
+    </code>
+    </pre><br>
+    <p>We obviously don't want extra code to check for buffer overflows in every function, so we disable that with the option: <code>-fno-stack-protector</code></p><br>
+    <h3><u>Align Stack</u></h3><br>
+    <p>We want to make sure that our stack is aligned in dword increments. Setting this to 2 will also stop the machine from optimizing the stack.</p><br>
+    <pre>
+    <code>
+    -mpreferred-stack-boundary=num
+        Attempt to keep the stack boundary aligned to a 2 raised to num byte boundary.  If -mpreferred-stack-boundary is not specified, the
+        default is 4 (16 bytes or 128-bits).
+
+        Warning: If you use this switch, then you must build all modules with the same value, including any libraries.  This includes the system
+        libraries and startup modules.
+    </code>
+    </pre><br>
+    <p>To enable dword sized increments of stack layout, pass the option: <code>-mpreferred-stack-boundary=2</code></p><br>
+    <h3><u>Disable Position Independent Executables and Code</u></h3><br>
+    <p>By default, with ALSR enabled, the compiler and linker will make position independent code and link to position independent executables.</p><br>
+    <p>This is not ideal in the case of testing simple shellcode, as the subroutines and executables we call will be randomized every time the program is run.</p><br>
+    <p>By disabling PIE and PIC, we will be able to easily test shellcode by grabbing addresses of functions we want to call reliably.</p><br>
+    <p>To disable, pass the arguments: <code>-no-pie -fno-pic</code></p><br>
+
+    <a id="compilingShellcode"></a>
+    <h1><u>Compiling Shellcode</u></h1><br>
+    <p>When writing shellcode, we want to make sure that after we have the binary, that it does it's intended purpose before attempting to inject it into a vulnerable buffer.</p><br>
+    <p>For example, the assembly given in the book for calling <code>execve()</code> to run <code>/bin/sh</code>:</p><br>
+    <pre>
+    <code>
+    ; int execve(const char *filename, char *const argv[], char *const envp[]);
+    ; needs 4 things
+    ; eax to hold execve syscall 11 (0xb)
+    ; ebx to hold address of string
+    ; ecx to hold pointer of argument array
+    ; edx to hold pointer of environment array, which will be null
+    
+    Section .text
+    
+        global _start
+    
+    _start:
+    
+        ; jump immediately to GoToCall
+        ; the Call will store the address of the next instruction into esi
+        jmp short GoToCall
+    
+    shellcode:
+    
+        ; pop the address of our string into esi
+        pop esi
+    
+        ; fill eax with xor bytes
+        xor eax, eax
+    
+        ; terminate our /bin/sh string by copying the last
+        ; null byte of eax over the last byte of the string
+        mov byte [esi+7], al
+    
+        ; put the address of the beginning of the string into ebx
+        lea ebx, [esi]
+    
+        ; copy the value stored in ebx, now the address of the beginning of the string
+        ; over the AAAA placeholders
+        ; this is the argument pointer to the binary to be executed
+        ; which execve needs
+        mov long [esi+8], ebx
+    
+        ; copy the nulls still stored in eax over the KKKK placeholders
+        mov long [esi+12], eax
+    
+        ; eax no longer needs to be null
+        ; so copy the value for the execve syscall (0x0b) into al
+        mov byte al, 0x0b
+    
+        ; load ebx with the address of our string
+        mov ebx, esi
+    
+        ; load ecx with the pointer of our string
+        lea ecx, [esi+8]
+    
+        ; load edx with the address of the value of KKKK, a pointer to null
+        lea edx, [esi+12]
+    
+        ; execute int 0x80 to make the syscall
+        int 0x80
+    
+    GoToCall:
+    
+        Call shellcode
+    
+        ; the address of this instruction will be put into esi after the call
+        db '/bin/shJAAAAKKKK'
+    </code>
+    </pre><br>
+    <p>We need to compile this as a 32-bit elf file, so to compile to an object with nasm:</p><br>
+    <code>nasm -f elf32 execve.nasm</code><br><br>
+    <p>Then to link the resulting <code>execve.o</code> object file to an executable binary, we need to use <code>ld</code>, the gnu linker.</p><br>
+    <p>To actually run the resulting elf ourselves, we need to make sure that the data on the stack is executable and in the correct architecture:</p><br>
+    <code>ld -m elf_i386 -z execstack -N -o execve execve.o</code><br><br>
+    <p>Here we set many similar things as when we were compiling C code with gcc, the exception being that we need to set the <code>-N</code> argument, meaning that the text and data sections will be readable and writable, as well as disabling linking against shared libraries.</p><br>
+    <pre>
+    <code>
+    -N
+    --omagic
+        Set the text and data sections to be readable and writable.  Also, do not page-align the data segment, and disable linking against shared
+        libraries.  If the output format supports Unix style magic numbers, mark the output as "OMAGIC". Note: Although a writable text section is
+        allowed for PE-COFF targets, it does not conform to the format specification published by Microsoft.
+    </code>
+    </pre><br>
+
+    
+
+
+</body>
+</html>
